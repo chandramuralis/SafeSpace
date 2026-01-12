@@ -26,13 +26,15 @@ body {
     background-color: var(--white);
     padding: 2rem;
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     width: 90%;
     max-width: 500px;
     text-align: center;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-family: var(--font-heading);
     color: #444;
 }
@@ -88,7 +90,8 @@ button:hover {
 /* Chat Specifics */
 #chat-window {
     height: 300px;
-    border: 2px dashed #ccc; /* Playful border */
+    border: 2px dashed #ccc;
+    /* Playful border */
     border-radius: 10px;
     margin: 20px 0;
     padding: 10px;
@@ -110,12 +113,14 @@ button:hover {
 }
 
 .my-message {
-    background-color: #d1fae5; /* Light green */
+    background-color: #d1fae5;
+    /* Light green */
     align-self: flex-end;
 }
 
 .system-message {
-    background-color: #fff3cd; /* Yellow warning-ish */
+    background-color: #fff3cd;
+    /* Yellow warning-ish */
     align-self: center;
     font-style: italic;
     font-size: 0.9rem;
@@ -135,19 +140,65 @@ button:hover {
     justify-content: center;
 }
 
-.feedback-msg {
-    margin-top: 10px;
+.feedback-container {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    background-color: #fff5f5;
+    border: 2px solid #fc8181;
+    text-align: left;
+    animation: slideUp 0.3s ease-out;
+}
+
+.feedback-header {
+    margin: 0 0 10px 0;
     font-weight: bold;
-    padding: 10px;
-    border-radius: 8px;
+    color: #c53030;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.error-msg {
-    color: var(--error-color);
+.feedback-details {
+    font-size: 0.95rem;
+    color: #2d3748;
 }
 
-.warning-style {
-    background-color: #ffeaea;
-    color: #d63031;
-    border: 1px solid #ff7675;
+.feedback-quote {
+    font-family: monospace;
+    background-color: #ffe3e3;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #c53030;
+}
+
+.feedback-rule {
+    margin-top: 5px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.feedback-rule::before {
+    content: "•";
+    position: absolute;
+    left: 5px;
+    color: #c53030;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-border {
+    border-color: #fc8181 !important;
+    box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.3);
 }
