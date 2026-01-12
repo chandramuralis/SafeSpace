@@ -3,52 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeChat - Be Kind!</title>
+    <title>SafeSpace - Anti-Bullying Chat</title>
+    <!-- 
+      SafeSpace - A Proof of Concept for Safe Digital Communication 
+      Features: Client-side bullying detection, multi-user simulation.
+    -->
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Importing friendly fonts for an 8th-grade audience -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="container">
+        <!-- HEADER -->
         <header>
-            <h1>SafeChat 🛡️</h1>
-            <p>A place to chat safely and kindly.</p>
+            <h1>SafeSpace 🛡️</h1>
+            <p>A kind space to talk.</p>
         </header>
 
-        <!-- Login Section -->
+        <!-- 
+          SECTION 1: LOGIN
+          shown by default. Hides when user logs in.
+        -->
         <div id="login-section">
-            <h2>🎉 Welcome!</h2>
-            <p>Please enter your name to join:</p>
-            <input type="text" id="username-input" placeholder="Your Name..." autocomplete="off">
-            <button id="login-btn">Join Chat</button>
+            <h2>Join the Chat</h2>
+            <input type="text" id="username-input" placeholder="Enter your name..." maxlength="15">
+            <button id="login-btn">Start Chatting</button>
             <p id="login-error" class="error-msg hidden">Please enter a name!</p>
         </div>
 
-        <!-- Chat Section (Hidden by default) -->
+        <!-- 
+          SECTION 2: CHAT INTERFACE
+          Hidden by default. Shows after login.
+        -->
         <div id="chat-section" class="hidden">
-            <div id="chat-header">
-                <h3>Logged in as: <span id="current-user-display"></span></h3>
+            <div class="chat-header">
+                <h3>Chatting as: <span id="current-user-display">User</span></h3>
                 <button id="logout-btn" class="secondary-btn">Leave</button>
             </div>
 
+            <!-- The main area where messages appear -->
             <div id="chat-window">
-                <div class="message system-message">
-                    Welcome to the chat! Remember to be nice. 😊
-                </div>
-                <!-- Messages will appear here -->
+                <!-- Messages will be injected here by app.js -->
             </div>
 
+            <!-- Input Area -->
             <div id="input-area">
-                <input type="text" id="message-input" placeholder="Type a kind message..." autocomplete="off">
-                <button id="send-btn">Send 🚀</button>
+                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                <button id="send-btn">Send</button>
             </div>
+
+            <!-- 
+              FEEDBACK CONTAINER
+              This box slides up when a message is blocked.
+              It explains WHY the message was blocked (Triggered Rule).
+            -->
             <div id="validation-feedback" class="feedback-container hidden">
-                <p class="feedback-header">🚫 Message Blocked</p>
-                <div id="feedback-details"></div>
+                <div class="feedback-header">
+                    <span>⚠️ Message Blocked</span>
+                </div>
+                <div id="feedback-details" class="feedback-details">
+                    <!-- Specific rules will be injected here -->
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Main Logic Script -->
     <script src="app.js"></script>
 </body>
 </html>

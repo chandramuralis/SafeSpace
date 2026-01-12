@@ -1,7 +1,7 @@
-# SafeChat Requirements
+# SafeSpace Requirements
 
-## Project Overview
-SafeChat is a web-based chat application designed as a Proof of Concept (POC) to demonstrate a bullying detection system. The primary goal is to educate 8th-grade students on how technology can monitor and prevent online bullying.
+## 1. Project Overview
+**SafeSpace** is a web-based chat application designed as a Proof of Concept (POC) to demonstrate a bullying detection system. The primary goal is to educate 8th-grade students on how technology can monitor and prevent online bullying.
 
 ## Objective
 To create a simple, client-side web page that allows users to chat while automatically filtering and blocking messages that contain bullying language, profanity, or threats.
