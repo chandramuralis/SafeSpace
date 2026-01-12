@@ -1,0 +1,153 @@
+:root {
+    --primary-color: #4facfe;
+    --primary-dark: #00f2fe;
+    --accent-color: #ff9a9e;
+    --bg-gradient: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+    --white: #ffffff;
+    --text-color: #333;
+    --error-color: #ff6b6b;
+    --success-color: #51cf66;
+    --font-heading: 'Comic Neue', cursive;
+    --font-body: 'Nunito', sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+    background-image: var(--bg-gradient);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.container {
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-heading);
+    color: #444;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"] {
+    width: 70%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: var(--font-body);
+}
+
+input[type="text"]:focus {
+    border-color: var(--primary-color);
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-weight: bold;
+    transition: transform 0.1s, background-color 0.3s;
+}
+
+button:hover {
+    background-color: #3b8dcf;
+    transform: scale(1.05);
+}
+
+.secondary-btn {
+    background-color: #aaa;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Chat Specifics */
+#chat-window {
+    height: 300px;
+    border: 2px dashed #ccc; /* Playful border */
+    border-radius: 10px;
+    margin: 20px 0;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.message {
+    background-color: #e3f2fd;
+    padding: 8px 12px;
+    border-radius: 15px;
+    margin-bottom: 8px;
+    max-width: 80%;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.my-message {
+    background-color: #d1fae5; /* Light green */
+    align-self: flex-end;
+}
+
+.system-message {
+    background-color: #fff3cd; /* Yellow warning-ish */
+    align-self: center;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.author {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #555;
+    display: block;
+    margin-bottom: 2px;
+}
+
+#input-area {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.feedback-msg {
+    margin-top: 10px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.error-msg {
+    color: var(--error-color);
+}
+
+.warning-style {
+    background-color: #ffeaea;
+    color: #d63031;
+    border: 1px solid #ff7675;
+}

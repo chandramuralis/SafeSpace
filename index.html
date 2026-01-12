@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeChat - Be Kind!</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>SafeChat 🛡️</h1>
+            <p>A place to chat safely and kindly.</p>
+        </header>
+
+        <!-- Login Section -->
+        <div id="login-section">
+            <h2>🎉 Welcome!</h2>
+            <p>Please enter your name to join:</p>
+            <input type="text" id="username-input" placeholder="Your Name..." autocomplete="off">
+            <button id="login-btn">Join Chat</button>
+            <p id="login-error" class="error-msg hidden">Please enter a name!</p>
+        </div>
+
+        <!-- Chat Section (Hidden by default) -->
+        <div id="chat-section" class="hidden">
+            <div id="chat-header">
+                <h3>Logged in as: <span id="current-user-display"></span></h3>
+                <button id="logout-btn" class="secondary-btn">Leave</button>
+            </div>
+
+            <div id="chat-window">
+                <div class="message system-message">
+                    Welcome to the chat! Remember to be nice. 😊
+                </div>
+                <!-- Messages will appear here -->
+            </div>
+
+            <div id="input-area">
+                <input type="text" id="message-input" placeholder="Type a kind message..." autocomplete="off">
+                <button id="send-btn">Send 🚀</button>
+            </div>
+            <p id="validation-feedback" class="feedback-msg hidden"></p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
