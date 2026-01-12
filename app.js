@@ -9,7 +9,7 @@ const REGEX_RULES = {
     threats: new RegExp("\\b(kill|i will kill|i'll kill|gonna kill|find you|make you pay|hurt you|beat you|stab you|shoot you|strangle you|choke you|punch you|kick you|destroy you|break your legs|end you|wipe you out|come after you|i'm coming for you|watch your back|attack you|i'll get you|i will get you|i'm gonna get you|send you to hell|threaten|stalk you)\\b", "i"),
 
     // Extracted from REGEXMATCH(..., "\b(fuck|shit|...)\b")
-    profanity: new RegExp("\\b(fuck|shit|ass|bitch|bastard|bullshit|cunt|dick|hell|motherfucker|niger|f u|asshole)\\b", "i")
+    profanity: new RegExp("\\b(fuck|fcuk|shit|ass|bitch|bastard|bullshit|cunt|dick|hell|motherfucker|niger|f u|asshole|wtf|what the fuck)\\b", "i")
 };
 
 // --- State ---
@@ -133,15 +133,20 @@ function validateMessage(message) {
     }
 
     // 4. All Caps
+    // RELAXED: User requested that we do not block just for upper case.
+    /*
     const upperCaseCount = (message.match(/[A-Z]/g) || []).length;
     if (upperCaseCount > 4 && upperCaseCount > message.length * 0.5) {
-        checkFailures.push({
+         checkFailures.push({
             rule: "Too much shouting (All Caps)",
             match: "CAPS"
-        });
+         });
     }
+    */
 
     // 5. Exclamations
+    // RELAXED: "HELLO!!!" should be allowed.
+    /*
     const exclamationCount = (message.match(/!/g) || []).length;
     if (exclamationCount >= 3) {
         checkFailures.push({
@@ -149,6 +154,7 @@ function validateMessage(message) {
             match: "!!!"
         });
     }
+    */
 
     if (checkFailures.length > 0) {
         return {
