@@ -12,6 +12,10 @@
     
     <!-- Importing friendly fonts for an 8th-grade audience -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+
+    <!-- TensorFlow.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
 </head>
 <body>
 
@@ -40,7 +44,12 @@
         <div id="chat-section" class="hidden">
             <div class="chat-header">
                 <h3>Chatting as: <span id="current-user-display">User</span></h3>
-                <button id="logout-btn" class="secondary-btn">Leave</button>
+                <div class="controls">
+                    <label style="font-size: 0.8rem; margin-right: 10px;">
+                        <input type="checkbox" id="regex-toggle" checked> Use Regex
+                    </label>
+                    <button id="logout-btn" class="secondary-btn">Leave</button>
+                </div>
             </div>
 
             <!-- The main area where messages appear -->

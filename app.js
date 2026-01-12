@@ -55,7 +55,17 @@ const validationFeedback = document.getElementById('validation-feedback');
  * 1. Checks SessionStorage to restore user session (if they refreshed).
  * 2. Loads the chat history from LocalStorage to show previous messages.
  */
-window.addEventListener('load', () => {
+// --- AI State ---
+// We use the TensorFlow.js 'toxicity' model.
+// It runs entirely in the browser (client-side), ensuring user privacy.
+let toxicityModel = null;
+
+// THRESHOLD: The confidence level (0.0 to 1.0) required to flag a message.
+// We set it to 0.5 (50%) to be more sensitive and catch subtle bullying.
+// A higher threshold (e.g., 0.9) would only catch very obvious toxicity.
+const THRESHOLD = 0.5;
+
+window.addEventListener('load', async () => {
     // 1. Check Identity (Session Storage)
     // SessionStorage is unique per tab. This keeps Tab A as "User A" and Tab B as "User B".
     const savedUser = sessionStorage.getItem('safeSpace_currentUser');
@@ -68,6 +78,17 @@ window.addEventListener('load', () => {
     // 2. Load History (Local Storage)
     // LocalStorage is shared across all tabs. This loads the common chat history.
     loadChatHistory();
+
+    // 3. Load AI Model (Background)
+    // This is an ASYNC operation that downloads the model (~200KB).
+    // We start it immediately so it's ready by the time the user logs in.
+    console.log("🧠 Loading AI Model...");
+    try {
+        toxicityModel = await toxicity.load(THRESHOLD);
+        console.log("🧠 AI Model Loaded and Ready!");
+    } catch (err) {
+        console.error("Failed to load AI model:", err);
+    }
 });
 
 /**
@@ -158,29 +179,44 @@ function toggleSections(isLoggedIn) {
 
 /**
  * Handles sending a new message.
- * 1. Validates the message against bullying rules.
- * 2. If safe, saves to LocalStorage.
- * 3. If unsafe, shows a warning.
+ * Converted to ASYNC to support AI await.
+ * This function manages the UI state (Waiting Cursor) while the AI thinks.
  */
-function handleSendMessage() {
+async function handleSendMessage() {
     const text = messageInput.value.trim();
     if (!text) return; // Don't send empty messages
 
-    // 1. VALIDATION LOGIC
-    const validationResult = validateMessage(text);
+    // 1. ASYNC VALIDATION LOGIC
+    // Show waiting state (Hourglass cursor) to indicate processing.
+    // This is important because the AI check can take 50-200ms or longer.
+    document.body.classList.add('wait-cursor');
+    sendBtn.classList.add('wait-cursor');
+    sendBtn.disabled = true; // Prevent double-submit
 
-    if (validationResult.safe) {
-        // Message is safe!
+    try {
+        // Await the result from the hybrid validator
+        const validationResult = await validateMessage(text);
 
-        // Save to History (LocalStorage)
-        saveMessageToHistory(currentUser, text);
+        if (validationResult.safe) {
+            // Message is safe!
 
-        messageInput.value = ""; // Clear input
-        validationFeedback.classList.add('hidden');
-        messageInput.classList.remove('error-border');
-    } else {
-        // Message is UNSAFE!
-        showWarning(text, validationResult.reasons);
+            // Save to History (LocalStorage)
+            saveMessageToHistory(currentUser, text);
+
+            messageInput.value = ""; // Clear input
+            validationFeedback.classList.add('hidden');
+            messageInput.classList.remove('error-border');
+        } else {
+            // Message is UNSAFE!
+            showWarning(text, validationResult.reasons);
+        }
+    } finally {
+        // CLEANUP: Always remove waiting state, whether success or error.
+        document.body.classList.remove('wait-cursor');
+        sendBtn.classList.remove('wait-cursor');
+        sendBtn.disabled = false;
+        // Refocus input so user can keep typing immediately
+        messageInput.focus();
     }
 }
 
@@ -241,42 +277,99 @@ function loadChatHistory() {
 
 /**
  * Checks if the message violates any SafeSpace rules.
+ * NOW ASYNC.
  * @param {string} message - The message text to check.
- * @returns {object} { safe: boolean, reasons: Array<{rule: string, match: string}> }
+ * @returns {Promise<object>} { safe: boolean, reasons: Array<{rule: string, match: string}> }
  */
-function validateMessage(message) {
+async function validateMessage(message) {
     let checkFailures = []; // Store failures: { rule: "Reason", match: "MatchedWord" }
 
-    // 1. Check Bullying Words
-    const bullyMatch = message.match(REGEX_RULES.bullyWords);
-    if (bullyMatch) {
-        checkFailures.push({
-            rule: "Contains unkind word",
-            match: bullyMatch[0] // The specific word found
-        });
-    }
+    // DEBUG FEATURE:
+    // We allow the user to toggle Regex off to test the AI model in isolation.
+    const useRegex = document.getElementById('regex-toggle').checked;
 
-    // 2. Check Threats
-    const threatMatch = message.match(REGEX_RULES.threats);
-    if (threatMatch) {
-        checkFailures.push({
-            rule: "Contains threatening language",
-            match: threatMatch[0]
-        });
-    }
+    // --- STEP 1: REGEX CHECKS (Fast & Deterministic) ---
+    // We run these first because they are instant (0ms).
+    if (useRegex) {
+        // 1. Check Bullying Words
+        const bullyMatch = message.match(REGEX_RULES.bullyWords);
+        if (bullyMatch) {
+            checkFailures.push({
+                rule: "Contains unkind word (Regex)",
+                match: bullyMatch[0] // The specific word found
+            });
+        }
 
-    // 3. Check Profanity
-    // We normalize the string (lower case, remove some punctuation) to catch tricks like "f.u.c.k"
-    const cleanMsg = " " + message.toLowerCase().replace(/[^a-z0-9 ]/g, " ") + " ";
-    const profanityMatch = cleanMsg.match(REGEX_RULES.profanity);
-    if (profanityMatch) {
-        checkFailures.push({
-            rule: "Contains Inappropriate language",
-            match: profanityMatch[0].trim()
-        });
+        // 2. Check Threats
+        const threatMatch = message.match(REGEX_RULES.threats);
+        if (threatMatch) {
+            checkFailures.push({
+                rule: "Contains threatening language (Regex)",
+                match: threatMatch[0]
+            });
+        }
+
+        // 3. Check Profanity
+        // We normalize the string (lower case, remove some punctuation) to catch tricks like "f.u.c.k"
+        const cleanMsg = " " + message.toLowerCase().replace(/[^a-z0-9 ]/g, " ") + " ";
+        const profanityMatch = cleanMsg.match(REGEX_RULES.profanity);
+        if (profanityMatch) {
+            checkFailures.push({
+                rule: "Contains Inappropriate language (Regex)",
+                match: profanityMatch[0].trim()
+            });
+        }
+    } else {
+        console.log("⏩ Regex validation skipped by user toggle.");
     }
 
     // Note: All-Caps and Exclamation rules were removed based on user feedback to be less strict.
+
+    // --- AI State ---
+    // let toxicityModel = null; // This is defined globally elsewhere
+    const THRESHOLD = 0.5; // Lowered to 50% for better sensitivity
+
+    // --- STEP 2: AI CHECKS (Contextual) ---
+    // Only run AI if:
+    // 1. The message passed Regex checks (checkFailures is empty).
+    //    (Optimization: If Regex caught it, we don't need to waste CPU on AI).
+    // 2. The AI Model is fully loaded (toxicityModel is not null).
+    if (checkFailures.length === 0 && toxicityModel) {
+        try {
+            console.log("🤔 AI Checking:", message);
+            const predictions = await toxicityModel.classify([message]);
+
+            // DEBUG: Print full analysis
+            console.log("📊 Raw Predictions:", predictions);
+
+            // Analyze predictions
+            predictions.forEach(prediction => {
+                // prediction.results[0].match is true if probability > threshold
+                if (prediction.results[0].match) {
+                    // Mapping technical labels to kid-friendly terms
+                    let label = prediction.label; // e.g., 'toxicity', 'insult'
+                    let friendlyRule = "Detected harmful content (AI)";
+
+                    if (label === 'insult') friendlyRule = "AI detected an insult";
+                    if (label === 'threat') friendlyRule = "AI detected a threat";
+                    if (label === 'obscene') friendlyRule = "AI detected bad words";
+
+                    // We only care about specific categories for this school context
+                    // Categories: identity_attack, insult, obscene, severe_toxicity, sexual_explicit, threat, toxicity
+                    if (['insult', 'threat', 'obscene', 'toxicity', 'identity_attack'].includes(label)) {
+                        checkFailures.push({
+                            rule: friendlyRule,
+                            match: `AI (${label})`
+                        });
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("AI Check Error:", err);
+        }
+    } else if (!toxicityModel) {
+        console.warn("⚠️ AI Model not ready yet. Skipping AI check.");
+    }
 
     if (checkFailures.length > 0) {
         return {

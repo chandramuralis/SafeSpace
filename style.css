@@ -110,6 +110,11 @@ button:hover {
     display: none !important;
 }
 
+/* Utility for processing state */
+.wait-cursor {
+    cursor: wait !important;
+}
+
 /* --- Chat Interface --- */
 #chat-window {
     height: 300px;
@@ -161,6 +166,11 @@ button:hover {
     color: #555;
     display: block;
     margin-bottom: 2px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
 }
 
 #input-area {
