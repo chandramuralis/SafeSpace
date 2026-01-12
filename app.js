@@ -14,6 +14,7 @@ const REGEX_RULES = {
 
 // --- State ---
 let currentUser = "";
+const STORAGE_KEY = 'safeChat_messages';
 
 // --- Elements ---
 const loginSection = document.getElementById('login-section');
@@ -31,6 +32,39 @@ const validationFeedback = document.getElementById('validation-feedback');
 
 // --- Event Listeners ---
 
+// Window Load - Check for existing session
+window.addEventListener('load', () => {
+    // 1. Check Identity (Session Storage)
+    const savedUser = sessionStorage.getItem('safeChat_currentUser');
+    if (savedUser) {
+        currentUser = savedUser;
+        currentUserDisplay.textContent = currentUser;
+        toggleSections(true);
+    }
+
+    // 2. Load History (Local Storage)
+    loadChatHistory();
+});
+
+// Storage Event - Sync changes from other tabs
+window.addEventListener('storage', (e) => {
+    console.log("🔔 Storage event triggered:", e.key);
+    if (e.key === STORAGE_KEY) {
+        console.log("🔄 Syncing chat history from storage update...");
+        loadChatHistory(); // Re-render chat if history changed
+    }
+});
+
+// POLLING FALLBACK: Check every 1 second in case storage event fails
+let lastKnownHistory = "";
+setInterval(() => {
+    const currentHistory = localStorage.getItem(STORAGE_KEY) || "[]";
+    if (currentHistory !== lastKnownHistory) {
+        console.log("⏰ Polling found new messages!");
+        loadChatHistory();
+    }
+}, 1000);
+
 // Login
 loginBtn.addEventListener('click', handleLogin);
 usernameInput.addEventListener('keypress', (e) => {
@@ -40,6 +74,7 @@ usernameInput.addEventListener('keypress', (e) => {
 // Logout
 logoutBtn.addEventListener('click', () => {
     currentUser = "";
+    sessionStorage.removeItem('safeChat_currentUser'); // Clear session
     toggleSections(false);
     usernameInput.value = "";
     loginError.classList.add('hidden');
@@ -57,9 +92,11 @@ function handleLogin() {
     const name = usernameInput.value.trim();
     if (name) {
         currentUser = name;
+        sessionStorage.setItem('safeChat_currentUser', currentUser); // Persist in session
         currentUserDisplay.textContent = currentUser;
         loginError.classList.add('hidden');
         toggleSections(true);
+        loadChatHistory(); // Make sure we show latest
     } else {
         loginError.classList.remove('hidden');
     }
@@ -69,6 +106,8 @@ function toggleSections(isLoggedIn) {
     if (isLoggedIn) {
         loginSection.classList.add('hidden');
         chatSection.classList.remove('hidden');
+        // Scroll to bottom after visible
+        setTimeout(() => chatWindow.scrollTop = chatWindow.scrollHeight, 10);
         messageInput.focus();
     } else {
         loginSection.classList.remove('hidden');
@@ -86,7 +125,10 @@ function handleSendMessage() {
 
     if (validationResult.safe) {
         // Message is safe!
-        displayMessage(currentUser, text, true);
+
+        // Save to History (LocalStorage)
+        saveMessageToHistory(currentUser, text);
+
         messageInput.value = ""; // Clear input
         validationFeedback.classList.add('hidden');
         messageInput.classList.remove('error-border');
@@ -94,6 +136,50 @@ function handleSendMessage() {
         // Message is UNSAFE!
         showWarning(text, validationResult.reasons);
     }
+}
+
+function saveMessageToHistory(sender, text) {
+    // 1. Get existing
+    const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+    // 2. Add new
+    history.push({
+        sender: sender,
+        text: text,
+        timestamp: new Date().toISOString()
+    });
+
+    // 3. Save back
+    console.log("💾 Saving message to LocalStorage:", history);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+
+    // 4. Update my own UI manually (storage event doesn't fire for self)
+    loadChatHistory();
+}
+
+function loadChatHistory() {
+    // 1. Clear current view
+    chatWindow.innerHTML = '';
+
+    // 2. Add System Welcome
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'message system-message';
+    welcomeDiv.textContent = 'Welcome to the chat! Remember to be nice. 😊';
+    chatWindow.appendChild(welcomeDiv);
+
+    // 3. Get history
+    const rawHistory = localStorage.getItem(STORAGE_KEY) || "[]";
+    const history = JSON.parse(rawHistory);
+    lastKnownHistory = rawHistory; // Update state to prevent polling loop
+
+    // 4. Render messages
+    history.forEach(msg => {
+        const isMe = (msg.sender === currentUser); // Check against *current session* user
+        displayMessage(msg.sender, msg.text, isMe);
+    });
+
+    // 5. Scroll
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 /**
@@ -197,7 +283,6 @@ function showWarning(originalMessage, reasons) {
     // Optional: Hide after really long time or let user close it? 
     // For educational purposes, keeping it visible is better until they type again.
 }
-
 
 
 function displayMessage(sender, text, isMe) {
