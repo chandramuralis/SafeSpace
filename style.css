@@ -1,32 +1,51 @@
+/* 
+  SafeSpace Stylesheet 
+  Theme: Friendly, Bright, and Safe for Students.
+*/
+
 :root {
+    /* Color Palette - Bright and Optimistic */
     --primary-color: #4facfe;
     --primary-dark: #00f2fe;
     --accent-color: #ff9a9e;
+
+    /* Background Gradient (Purple/Blue Theme) */
     --bg-gradient: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+
     --white: #ffffff;
     --text-color: #333;
+
+    /* Status Colors */
     --error-color: #ff6b6b;
     --success-color: #51cf66;
+
+    /* Fonts */
     --font-heading: 'Comic Neue', cursive;
+    /* Playful */
     --font-body: 'Nunito', sans-serif;
+    /* Clean & Readable */
 }
 
 body {
     font-family: var(--font-body);
     background-image: var(--bg-gradient);
+    /* Full page gradient */
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Center the app card on screen */
     margin: 0;
     color: var(--text-color);
 }
 
+/* Main App Card */
 .container {
     background-color: var(--white);
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    /* Soft shadow for depth */
     width: 90%;
     max-width: 500px;
     text-align: center;
@@ -44,6 +63,7 @@ h1 {
     margin-bottom: 0.5rem;
 }
 
+/* --- Input Elements --- */
 input[type="text"] {
     width: 70%;
     padding: 12px;
@@ -59,6 +79,7 @@ input[type="text"]:focus {
     border-color: var(--primary-color);
 }
 
+/* --- Buttons --- */
 button {
     padding: 12px 20px;
     border: none;
@@ -75,6 +96,7 @@ button {
 button:hover {
     background-color: #3b8dcf;
     transform: scale(1.05);
+    /* Slight grow effect */
 }
 
 .secondary-btn {
@@ -83,27 +105,32 @@ button:hover {
     font-size: 0.8rem;
 }
 
+/* Utility to hide elements */
 .hidden {
     display: none !important;
 }
 
-/* Chat Specifics */
+/* --- Chat Interface --- */
 #chat-window {
     height: 300px;
     border: 2px dashed #ccc;
-    /* Playful border */
+    /* Dotted line feels like a notebook */
     border-radius: 10px;
     margin: 20px 0;
     padding: 10px;
     overflow-y: auto;
+    /* Scrollable */
     background-color: #f9f9f9;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    /* Messages align left by default */
 }
 
+/* Message Bubble */
 .message {
     background-color: #e3f2fd;
+    /* Light Blue for others */
     padding: 8px 12px;
     border-radius: 15px;
     margin-bottom: 8px;
@@ -112,20 +139,22 @@ button:hover {
     word-wrap: break-word;
 }
 
+/* My Message Bubble (Aligned Right) */
 .my-message {
     background-color: #d1fae5;
-    /* Light green */
+    /* Light Green for me */
     align-self: flex-end;
 }
 
 .system-message {
     background-color: #fff3cd;
-    /* Yellow warning-ish */
+    /* Yellow for alerts */
     align-self: center;
     font-style: italic;
     font-size: 0.9rem;
 }
 
+/* Sender Name */
 .author {
     font-weight: bold;
     font-size: 0.8rem;
@@ -140,14 +169,17 @@ button:hover {
     justify-content: center;
 }
 
+/* --- Validation Feedback Box --- */
 .feedback-container {
     margin-top: 15px;
     padding: 15px;
     border-radius: 12px;
     background-color: #fff5f5;
+    /* Light Red background */
     border: 2px solid #fc8181;
     text-align: left;
     animation: slideUp 0.3s ease-out;
+    /* Smooth entrance */
 }
 
 .feedback-header {
@@ -186,6 +218,7 @@ button:hover {
     color: #c53030;
 }
 
+/* Animation for Feedback Box */
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -198,6 +231,7 @@ button:hover {
     }
 }
 
+/* Error State for Input Box */
 .error-border {
     border-color: #fc8181 !important;
     box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.3);
