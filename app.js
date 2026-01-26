@@ -63,7 +63,7 @@ let toxicityModel = null;
 // THRESHOLD: The confidence level (0.0 to 1.0) required to flag a message.
 // We set it to 0.5 (50%) to be more sensitive and catch subtle bullying.
 // A higher threshold (e.g., 0.9) would only catch very obvious toxicity.
-const THRESHOLD = 0.5;
+const THRESHOLD = 0.7;
 
 window.addEventListener('load', async () => {
     // 1. Check Identity (Session Storage)
@@ -204,11 +204,12 @@ async function handleSendMessage() {
             saveMessageToHistory(currentUser, text);
 
             messageInput.value = ""; // Clear input
-            validationFeedback.classList.add('hidden');
-            messageInput.classList.remove('error-border');
+
+            // Show Success Feedback with AI Status
+            showFeedback(text, [], true, validationResult.aiChecked);
         } else {
             // Message is UNSAFE!
-            showWarning(text, validationResult.reasons);
+            showFeedback(text, validationResult.reasons, false, validationResult.aiChecked);
         }
     } finally {
         // CLEANUP: Always remove waiting state, whether success or error.
@@ -283,6 +284,7 @@ function loadChatHistory() {
  */
 async function validateMessage(message) {
     let checkFailures = []; // Store failures: { rule: "Reason", match: "MatchedWord" }
+    let aiChecked = false; // Track if AI actually ran
 
     // DEBUG FEATURE:
     // We allow the user to toggle Regex off to test the AI model in isolation.
@@ -332,9 +334,10 @@ async function validateMessage(message) {
     // --- STEP 2: AI CHECKS (Contextual) ---
     // Only run AI if:
     // 1. The message passed Regex checks (checkFailures is empty).
-    //    (Optimization: If Regex caught it, we don't need to waste CPU on AI).
+    //    (Optimization: If Blocked by word bank, we don't need to waste CPU on AI).
     // 2. The AI Model is fully loaded (toxicityModel is not null).
     if (checkFailures.length === 0 && toxicityModel) {
+        aiChecked = true; // Mark that we are running the AI
         try {
             console.log("🤔 AI Checking:", message);
             const predictions = await toxicityModel.classify([message]);
@@ -374,46 +377,69 @@ async function validateMessage(message) {
     if (checkFailures.length > 0) {
         return {
             safe: false,
-            reasons: checkFailures
+            reasons: checkFailures,
+            aiChecked: aiChecked
         };
     }
 
-    return { safe: true, reasons: [] };
+    return { safe: true, reasons: [], aiChecked: aiChecked };
 }
 
 /**
- * Displays a visual warning block detailing why a message was rejected.
- * @param {string} originalMessage - The text user tried to send.
- * @param {Array} reasons - List of failed rules.
+ * Displays a visual feedback block (Info or Warning).
+ * @param {string} originalMessage - The text processed.
+ * @param {Array} reasons - List of failed rules (empty if safe).
+ * @param {boolean} isSafe - Whether message was allowed.
+ * @param {boolean} aiChecked - Whether AI analysis ran.
  */
-function showWarning(originalMessage, reasons) {
+function showFeedback(originalMessage, reasons, isSafe, aiChecked) {
     const detailsDiv = document.getElementById('feedback-details');
-    detailsDiv.innerHTML = ''; // Clear previous warnings
+    // We need to target the header text specifically
+    const feedbackHeader = document.querySelector('.feedback-header span');
+    const feedbackBox = document.getElementById('validation-feedback');
 
-    // Header
-    const explanationP = document.createElement('p');
-    explanationP.innerHTML = `Your message <strong>"${originalMessage}"</strong> was blocked because:`;
-    detailsDiv.appendChild(explanationP);
+    detailsDiv.innerHTML = ''; // Clear previous
 
-    // List specific reasons
-    reasons.forEach(failure => {
-        const item = document.createElement('div');
-        item.className = 'feedback-rule';
+    if (isSafe) {
+        // SUCCESS STATE
+        feedbackHeader.textContent = "✅ Message Sent";
+        feedbackBox.classList.add('info');
+        document.querySelector('.feedback-header').classList.add('info');
+        messageInput.classList.remove('error-border');
 
-        let matchText = "";
-        // Don't repeat the word if it was a generic rule like CAPS
-        if (failure.match && failure.match !== "CAPS" && failure.match !== "!!!") {
-            matchText = ` (Found: <span class="feedback-quote">${failure.match}</span>)`;
-        }
+        const info = document.createElement('div');
+        info.innerHTML = `
+            <strong>AI Status:</strong> ${aiChecked ? "Checked (Clean)" : "Skipped (Not Needed)"}
+        `;
+        detailsDiv.appendChild(info);
+    } else {
+        // ERROR STATE
+        feedbackHeader.textContent = "⚠️ Message Blocked";
+        feedbackBox.classList.remove('info');
+        document.querySelector('.feedback-header').classList.remove('info');
+        messageInput.classList.add('error-border');
 
-        item.innerHTML = `<strong>${failure.rule}</strong>${matchText}`;
-        detailsDiv.appendChild(item);
-    });
+        const explanationP = document.createElement('p');
+        explanationP.innerHTML = `<strong>AI Status:</strong> ${aiChecked ? "Checked (Found Issues)" : "Skipped (Blocked by word bank)"}<br><br>
+                                  Your message was blocked because:`;
+        detailsDiv.appendChild(explanationP);
+
+        // List specific reasons
+        reasons.forEach(failure => {
+            const item = document.createElement('div');
+            item.className = 'feedback-rule';
+
+            let matchText = "";
+            if (failure.match && failure.match !== "CAPS" && failure.match !== "!!!") {
+                matchText = ` (Found: <span class="feedback-quote">${failure.match}</span>)`;
+            }
+
+            item.innerHTML = `<strong>${failure.rule}</strong>${matchText}`;
+            detailsDiv.appendChild(item);
+        });
+    }
 
     validationFeedback.classList.remove('hidden');
-
-    // Add red border and shake animation to input
-    messageInput.classList.add('error-border');
 }
 
 /**

@@ -168,6 +168,15 @@ button:hover {
     margin-bottom: 2px;
 }
 
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
 .controls {
     display: flex;
     align-items: center;
@@ -241,8 +250,27 @@ button:hover {
     }
 }
 
+/* Info State for Feedback Box (Success/AI Status) */
+.feedback-container.info {
+    background-color: #f0fff4;
+    /* Light Green */
+    border-color: #68d391;
+}
+
+.feedback-header.info {
+    color: #2f855a;
+}
+
 /* Error State for Input Box */
 .error-border {
     border-color: #fc8181 !important;
     box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.3);
+}
+
+#login-btn {
+    margin-top: 10px;
+}
+
+#login-error {
+    color: red;
 }
