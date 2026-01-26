@@ -81,13 +81,30 @@ window.addEventListener('load', async () => {
 
     // 3. Load AI Model (Background)
     // This is an ASYNC operation that downloads the model (~200KB).
-    // We start it immediately so it's ready by the time the user logs in.
-    console.log("🧠 Loading AI Model...");
+    // 3. Load AI Model (Background)
+
+    // DISABLE UI during load
+    sendBtn.disabled = true;
+    messageInput.disabled = true;
+    const originalPlaceholder = messageInput.placeholder;
+    messageInput.placeholder = "Initializing AI safety protocols...";
+
+    // Show loading cursor
+    document.body.classList.add('wait-cursor');
+
     try {
         toxicityModel = await toxicity.load(THRESHOLD);
         console.log("🧠 AI Model Loaded and Ready!");
     } catch (err) {
         console.error("Failed to load AI model:", err);
+    } finally {
+        // ENABLE UI after load (or fail)
+        sendBtn.disabled = false;
+        messageInput.disabled = false;
+        messageInput.placeholder = originalPlaceholder;
+
+        // Remove loading cursor whether success or fail
+        document.body.classList.remove('wait-cursor');
     }
 });
 
