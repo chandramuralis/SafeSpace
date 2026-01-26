@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +10,16 @@
       Features: Client-side bullying detection, multi-user simulation.
     -->
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- Importing friendly fonts for an 8th-grade audience -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&family=Comic+Neue:wght@700&display=swap"
+        rel="stylesheet">
 
     <!-- TensorFlow.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
 </head>
+
 <body>
 
     <div class="container">
@@ -48,6 +51,7 @@
                     <label style="font-size: 0.8rem; margin-right: 10px;">
                         <input type="checkbox" id="regex-toggle"> Use Wordbank
                     </label>
+                    <button id="clear-btn" class="secondary-btn" style="margin-right: 5px;">Clear</button>
                     <button id="logout-btn" class="secondary-btn">Leave</button>
                 </div>
             </div>
@@ -82,4 +86,5 @@
     <!-- Main Logic Script -->
     <script src="app.js"></script>
 </body>
+
 </html>

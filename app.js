@@ -42,6 +42,7 @@ const loginError = document.getElementById('login-error');
 
 const currentUserDisplay = document.getElementById('current-user-display');
 const logoutBtn = document.getElementById('logout-btn');
+const clearBtn = document.getElementById('clear-btn');
 const chatWindow = document.getElementById('chat-window');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
@@ -142,12 +143,23 @@ usernameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleLogin();
 });
 
+// ...
+
+
 logoutBtn.addEventListener('click', () => {
     currentUser = "";
     sessionStorage.removeItem('safeSpace_currentUser'); // Clear session
     toggleSections(false);
     usernameInput.value = "";
     loginError.classList.add('hidden');
+});
+
+// Clear Chat History Logic
+clearBtn.addEventListener('click', () => {
+    if (confirm("Are you sure you want to clear the chat history for everyone?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        loadChatHistory(); // Updates UI immediately
+    }
 });
 
 sendBtn.addEventListener('click', handleSendMessage);
@@ -202,6 +214,10 @@ function toggleSections(isLoggedIn) {
 async function handleSendMessage() {
     const text = messageInput.value.trim();
     if (!text) return; // Don't send empty messages
+
+    // CLEAR PREVIOUS FEEDBACK IMMEDIATELLY
+    validationFeedback.classList.add('hidden');
+    messageInput.classList.remove('error-border');
 
     // 1. ASYNC VALIDATION LOGIC
     // Show waiting state (Hourglass cursor) to indicate processing.
