@@ -18,7 +18,7 @@ const REGEX_RULES = {
     bullyWords: new RegExp("\\b(idiot|loser|stupid|dumb|moron|jerk|trash|worthless|crybaby|weirdo|fool|lazy|ugly|nobody|pathetic|silly|annoying|ridiculous|losing|weak|lame|failure|idiotic|clown|jerkface|dummy|loserface)\\b", "i"),
 
     // Rule: Detect threatening phrases.
-    threats: new RegExp("\\b(kill|i will kill|i'll kill|gonna kill|find you|make you pay|hurt you|beat you|stab you|shoot you|strangle you|choke you|punch you|kick you|destroy you|break your legs|end you|wipe you out|come after you|i'm coming for you|watch your back|attack you|i'll get you|i will get you|i'm gonna get you|send you to hell|threaten|stalk you)\\b", "i"),
+    threats: new RegExp("\\b(murder|kill|i will kill|i'll kill|gonna kill|find you|make you pay|hurt you|beat you|stab you|shoot you|strangle you|choke you|punch you|kick you|destroy you|break your legs|end you|wipe you out|come after you|i'm coming for you|watch your back|attack you|i'll get you|i will get you|i'm gonna get you|send you to hell|threaten|stalk you)\\b", "i"),
 
     // Rule: Detect profanity.
     // Includes common variations and misspellings.
@@ -64,7 +64,7 @@ let toxicityModel = null;
 // THRESHOLD: The confidence level (0.0 to 1.0) required to flag a message.
 // We set it to 0.5 (50%) to be more sensitive and catch subtle bullying.
 // A higher threshold (e.g., 0.9) would only catch very obvious toxicity.
-const THRESHOLD = 0.7;
+const THRESHOLD = 0.5;
 
 window.addEventListener('load', async () => {
     // 1. Check Identity (Session Storage)
